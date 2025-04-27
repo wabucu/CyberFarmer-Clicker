@@ -4,56 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WABUCU CyberFarm</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="icon" type="image/png" href="assets/images/favicon.png">
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
-    <script src="js/particles.js" defer></script>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #44ff44;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        #gameContainer {
+            max-width: 600px;
+            margin: 0 auto;
+            border: 2px solid #44ff44;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        button {
+            background: #1a2f1a;
+            color: #44ff44;
+            border: 1px solid #44ff44;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #44ff44;
+            color: #0a0a0a;
+        }
+        #walletStatus {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(0,0,0,0.5);
+        }
+    </style>
 </head>
 <body>
-    <div id="particles-js"></div>
-    
-    <header class="cyber-header">
-        <h1>🌐 CYBER ECO FARM</h1>
-        <div class="wallet-status" id="walletStatus">
-            <span class="led"></span>
-            <span id="address"></span>
+    <div id="gameContainer">
+        <h1>🌿 WABUCU CyberFarm</h1>
+        
+        <div id="walletStatus">
+            <span>🔴 Кошелек не подключен</span>
         </div>
-    </header>
 
-    <main class="game-container">
-        <div class="farm-area">
-            <div class="cyber-tree" id="mainTree">
-                <div class="energy-pulse"></div>
-                <div class="leaves"></div>
-            </div>
-            <div class="drones-container"></div>
+        <div id="farmArea">
+            <pre>
+   ,dP""C8b,
+ ,dP"    "C8,
+dP"      `Y8
+8P         8
+8b,      ,dP
+ "8a,  ,aP"
+   "YaaP"
+            </pre>
         </div>
 
         <div class="hud">
-            <div class="stats-panel">
-                <div class="resource-bar">
-                    <span class="icon">🌱</span>
-                    <div class="bar-container">
-                        <div class="progress" id="oxygenBar"></div>
-                        <span>Oxygen: <span id="oxygenValue">100</span>%</span>
-                    </div>
-                </div>
-                
-                <button class="cyber-button" id="buyDroneBtn">
-                    🛸 Купить дрон (50 WBC)
-                </button>
-            </div>
-
-            <div class="action-panel">
-                <button class="main-action" id="harvestBtn">
-                    <span class="glow">🌾 СЖАТЬ</span>
-                    <div class="click-counter" id="clickCounter">0</div>
-                </button>
-            </div>
+            <p>Кислород: <span id="oxygenValue">100</span>%</p>
+            <p>Дроны: <span id="dronesCount">0</span></p>
+            <p>Кликов: <span id="clicksCount">0</span></p>
         </div>
-    </main>
 
-    <div class="achievement-toast" id="achievementToast"></div>
+        <button id="connectBtn">🔗 Подключить MetaMask</button>
+        <button id="harvestBtn" disabled>🌾 Сжать (0)</button>
+        <button id="buyDroneBtn" disabled>🛸 Купить дрон (50 WBC)</button>
+    </div>
+
     <script src="js/game.js"></script>
 </body>
 </html>
