@@ -12,13 +12,13 @@
             text-align: center;
             margin: 0;
             padding: 20px;
+            overflow: hidden;
+            user-select: none;
         }
         #gameContainer {
             max-width: 600px;
             margin: 0 auto;
-            border: 2px solid #44ff44;
-            padding: 20px;
-            border-radius: 10px;
+            position: relative;
         }
         button {
             background: #1a2f1a;
@@ -28,15 +28,47 @@
             margin: 10px;
             cursor: pointer;
             transition: all 0.3s;
+            font-family: inherit;
         }
         button:hover {
             background: #44ff44;
             color: #0a0a0a;
         }
-        #walletStatus {
-            margin: 15px 0;
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #farmArea {
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+            margin: 20px 0;
+            border: 1px dashed #44ff44;
+        }
+        .plant {
+            position: absolute;
+            font-size: 24px;
+            bottom: 10px;
+            transition: transform 0.3s;
+        }
+        .drone {
+            position: absolute;
+            font-size: 20px;
+            animation: droneFly 5s linear infinite;
+        }
+        @keyframes droneFly {
+            0% { transform: translateX(-50px) translateY(0); }
+            100% { transform: translateX(calc(100vw + 50px)) translateY(-100px); }
+        }
+        #stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .stat {
             padding: 10px;
-            background: rgba(0,0,0,0.5);
+            border: 1px solid #44ff44;
+            min-width: 100px;
         }
     </style>
 </head>
@@ -44,31 +76,19 @@
     <div id="gameContainer">
         <h1>🌿 WABUCU CyberFarm</h1>
         
-        <div id="walletStatus">
-            <span>🔴 Кошелек не подключен</span>
+        <div id="stats">
+            <div class="stat">🌱 Растения: <span id="plantsCount">0</span></div>
+            <div class="stat">⚡ WBC: <span id="wbcCount">0</span></div>
+            <div class="stat">🛸 Дроны: <span id="dronesCount">0</span></div>
         </div>
 
-        <div id="farmArea">
-            <pre>
-   ,dP""C8b,
- ,dP"    "C8,
-dP"      `Y8
-8P         8
-8b,      ,dP
- "8a,  ,aP"
-   "YaaP"
-            </pre>
-        </div>
+        <div id="farmArea"></div>
 
-        <div class="hud">
-            <p>Кислород: <span id="oxygenValue">100</span>%</p>
-            <p>Дроны: <span id="dronesCount">0</span></p>
-            <p>Кликов: <span id="clicksCount">0</span></p>
-        </div>
+        <button id="plantBtn">🌱 Посадить (10 WBC)</button>
+        <button id="harvestBtn">🌾 Собрать урожай</button>
+        <button id="droneBtn">🛸 Купить дрон (50 WBC)</button>
 
-        <button id="connectBtn">🔗 Подключить MetaMask</button>
-        <button id="harvestBtn" disabled>🌾 Сжать (0)</button>
-        <button id="buyDroneBtn" disabled>🛸 Купить дрон (50 WBC)</button>
+        <div id="eventLog"></div>
     </div>
 
     <script src="js/game.js"></script>
