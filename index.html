@@ -9,6 +9,74 @@
     <button id="connectBtn">🔗 Подключить кошелек</button>
     <button id="clickBtn" disabled>🌾 Сжать! (0 кликов)</button>
     <div id="address"></div>
-    <script src="game.js"></script>
+    <script>
+        // Исправленная версия game.js
+        let userAddress = null;
+        let clickCount = 0;
+
+        // 1. Подключение кошелька
+        document.getElementById('connectBtn').addEventListener('click', async () => {
+            console.log('Кнопка подключения нажата'); // Логирование
+            
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ 
+                        method: 'eth_requestAccounts' 
+                    });
+                    
+                    userAddress = accounts[0];
+                    console.log('Адрес подключен:', userAddress);
+
+                    // Загрузка сохраненных данных
+                    const savedData = localStorage.getItem(userAddress);
+                    clickCount = savedData ? parseInt(savedData) : 0;
+                    
+                    updateUI();
+                    
+                    // Слушатель изменений аккаунта
+                    window.ethereum.on('accountsChanged', (newAccounts) => {
+                        userAddress = newAccounts[0] || null;
+                        updateUI();
+                    });
+
+                } catch (error) {
+                    alert("Ошибка подключения: " + error.message);
+                }
+            } else {
+                alert("Установите MetaMask!");
+            }
+        });
+
+        // 2. Обработчик кликов
+        document.getElementById('clickBtn').addEventListener('click', () => {
+            if (!userAddress) return;
+            
+            clickCount++;
+            localStorage.setItem(userAddress, clickCount.toString());
+            console.log('Клики сохранены:', clickCount);
+            
+            updateUI();
+        });
+
+        // 3. Обновление интерфейса
+        function updateUI() {
+            document.getElementById('connectBtn').disabled = !!userAddress;
+            document.getElementById('clickBtn').disabled = !userAddress;
+            document.getElementById('clickBtn').textContent = `🌾 Сжать! (${clickCount} кликов)`;
+            document.getElementById('address').textContent = userAddress 
+                ? `Адрес: ${userAddress.slice(0,6)}...${userAddress.slice(-4)}` 
+                : '';
+        }
+
+        // Автопроверка подключения при загрузке
+        window.addEventListener('load', async () => {
+            if (window.ethereum && window.ethereum.selectedAddress) {
+                userAddress = window.ethereum.selectedAddress;
+                const savedData = localStorage.getItem(userAddress);
+                clickCount = savedData ? parseInt(savedData) : 0;
+                updateUI();
+            }
+        });
+    </script>
 </body>
 </html>
