@@ -1,111 +1,130 @@
-class CyberFarmGame {
+class CyberFarm {
     constructor() {
-        this.oxygen = 100;
+        this.wbc = 50; // Стартовый баланс
+        this.plants = [];
         this.drones = 0;
-        this.clicks = 0;
-        this.isConnected = false;
+        this.plantCost = 10;
+        this.droneCost = 50;
+        this.harvestValue = 1;
         
         this.initElements();
         this.setupEventListeners();
+        this.gameLoop();
+        this.updateUI();
     }
 
     initElements() {
-        this.connectBtn = document.getElementById('connectBtn');
+        this.plantBtn = document.getElementById('plantBtn');
         this.harvestBtn = document.getElementById('harvestBtn');
-        this.buyDroneBtn = document.getElementById('buyDroneBtn');
-        this.walletStatus = document.getElementById('walletStatus');
-        this.oxygenDisplay = document.getElementById('oxygenValue');
-        this.dronesDisplay = document.getElementById('dronesCount');
-        this.clicksDisplay = document.getElementById('clicksCount');
+        this.droneBtn = document.getElementById('droneBtn');
+        this.farmArea = document.getElementById('farmArea');
+        this.plantsCount = document.getElementById('plantsCount');
+        this.wbcCount = document.getElementById('wbcCount');
+        this.dronesCount = document.getElementById('dronesCount');
+        this.eventLog = document.getElementById('eventLog');
     }
 
     setupEventListeners() {
-        this.connectBtn.addEventListener('click', () => this.connectWallet());
+        this.plantBtn.addEventListener('click', () => this.plant());
         this.harvestBtn.addEventListener('click', () => this.harvest());
-        this.buyDroneBtn.addEventListener('click', () => this.buyDrone());
+        this.droneBtn.addEventListener('click', () => this.buyDrone());
     }
 
-    async connectWallet() {
-        if (typeof window.ethereum !== 'undefined') {
-            try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                this.isConnected = true;
-                this.walletStatus.innerHTML = `🟢 Подключен: ${accounts[0].slice(0,6)}...${accounts[0].slice(-4)}`;
-                this.harvestBtn.disabled = false;
-                this.buyDroneBtn.disabled = false;
-                
-                // Слушаем изменения аккаунта
-                window.ethereum.on('accountsChanged', (accounts) => {
-                    if (accounts.length === 0) {
-                        this.handleDisconnect();
-                    }
-                });
-            } catch (error) {
-                console.error("Ошибка подключения:", error);
-            }
-        } else {
-            alert("Установите MetaMask!");
+    plant() {
+        if (this.wbc >= this.plantCost) {
+            this.wbc -= this.plantCost;
+            const plant = document.createElement('div');
+            plant.className = 'plant';
+            plant.textContent = '🌱';
+            plant.style.left = `${Math.random() * 80 + 10}%`;
+            
+            // Анимация роста
+            setTimeout(() => {
+                plant.textContent = '🌿';
+                plant.style.transform = 'scale(1.5)';
+            }, 1000);
+            
+            setTimeout(() => {
+                plant.textContent = '🌳';
+                plant.style.transform = 'scale(2)';
+            }, 2000);
+            
+            this.farmArea.appendChild(plant);
+            this.plants.push(plant);
+            this.updateUI();
+            this.logEvent('Посажено новое растение!');
         }
-    }
-
-    handleDisconnect() {
-        this.isConnected = false;
-        this.walletStatus.innerHTML = "🔴 Кошелек отключен";
-        this.harvestBtn.disabled = true;
-        this.buyDroneBtn.disabled = true;
     }
 
     harvest() {
-        if (!this.isConnected) return;
+        if (this.plants.length === 0) return;
         
-        this.clicks++;
-        this.oxygen += 1 + Math.floor(this.drones * 0.5);
+        const harvested = this.plants.length * this.harvestValue;
+        this.wbc += harvested;
+        
+        // Анимация сбора
+        this.plants.forEach(plant => {
+            plant.textContent = '💰';
+            setTimeout(() => plant.remove(), 500);
+        });
+        
+        this.plants = [];
         this.updateUI();
-        
-        // Анимация
-        this.harvestBtn.textContent = `🌾 Сжать (${this.clicks})`;
-        this.harvestBtn.style.transform = 'scale(1.1)';
-        setTimeout(() => {
-            this.harvestBtn.style.transform = 'scale(1)';
-        }, 200);
+        this.logEvent(`Собрано урожая: +${harvested} WBC!`);
     }
 
     buyDrone() {
-        if (this.oxygen >= 50 && this.isConnected) {
-            this.oxygen -= 50;
+        if (this.wbc >= this.droneCost) {
+            this.wbc -= this.droneCost;
             this.drones++;
-            this.updateUI();
             
-            // Добавляем ASCII-дрона
-            const farmArea = document.getElementById('farmArea');
+            // Создаем дрон
             const drone = document.createElement('div');
+            drone.className = 'drone';
             drone.textContent = '🛸';
-            drone.style.position = 'absolute';
-            drone.style.left = `${Math.random() * 80 + 10}%`;
-            farmArea.appendChild(drone);
+            drone.style.top = `${Math.random() * 100}px`;
+            drone.style.animationDuration = `${5 - this.drones * 0.5}s`;
+            this.farmArea.appendChild(drone);
             
-            // Анимация полета
-            let pos = 0;
-            const flyInterval = setInterval(() => {
-                pos += 5;
-                drone.style.top = `${pos}px`;
-                if (pos > 100) {
-                    clearInterval(flyInterval);
-                    drone.remove();
-                }
-            }, 100);
+            this.updateUI();
+            this.logEvent('Активирован новый дрон!');
         }
     }
 
+    gameLoop() {
+        setInterval(() => {
+            // Автоматический доход от дронов
+            if (this.drones > 0) {
+                const droneIncome = this.drones * 0.5;
+                this.wbc += droneIncome;
+                this.updateUI();
+            }
+        }, 1000);
+    }
+
     updateUI() {
-        this.oxygenDisplay.textContent = Math.floor(this.oxygen);
-        this.dronesDisplay.textContent = this.drones;
-        this.clicksDisplay.textContent = this.clicks;
-        this.buyDroneBtn.textContent = `🛸 Купить дрон (50 WBC)`;
+        this.plantsCount.textContent = this.plants.length;
+        this.wbcCount.textContent = Math.floor(this.wbc);
+        this.dronesCount.textContent = this.drones;
+        
+        this.plantBtn.disabled = this.wbc < this.plantCost;
+        this.droneBtn.disabled = this.wbc < this.droneCost;
+        this.plantBtn.textContent = `🌱 Посадить (${this.plantCost} WBC)`;
+        this.droneBtn.textContent = `🛸 Купить дрон (${this.droneCost} WBC)`;
+    }
+
+    logEvent(message) {
+        const event = document.createElement('div');
+        event.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        this.eventLog.prepend(event);
+        
+        if (this.eventLog.children.length > 5) {
+            this.eventLog.removeChild(this.eventLog.lastChild);
+        }
     }
 }
 
-// Инициализация игры при загрузке страницы
+// Запуск игры при загрузке страницы
 window.addEventListener('load', () => {
-    const game = new CyberFarmGame();
+    const game = new CyberFarm();
 });
