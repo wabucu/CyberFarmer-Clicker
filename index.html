@@ -38,6 +38,11 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+        #walletStatus {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #44ff44;
+        }
         #farmArea {
             height: 200px;
             position: relative;
@@ -50,15 +55,6 @@
             font-size: 24px;
             bottom: 10px;
             transition: transform 0.3s;
-        }
-        .drone {
-            position: absolute;
-            font-size: 20px;
-            animation: droneFly 5s linear infinite;
-        }
-        @keyframes droneFly {
-            0% { transform: translateX(-50px) translateY(0); }
-            100% { transform: translateX(calc(100vw + 50px)) translateY(-100px); }
         }
         #stats {
             display: flex;
@@ -76,21 +72,26 @@
     <div id="gameContainer">
         <h1>🌿 WABUCU CyberFarm</h1>
         
+        <div id="walletStatus">
+            🔴 MetaMask не подключен
+        </div>
+
         <div id="stats">
             <div class="stat">🌱 Растения: <span id="plantsCount">0</span></div>
             <div class="stat">⚡ WBC: <span id="wbcCount">0</span></div>
-            <div class="stat">🛸 Дроны: <span id="dronesCount">0</span></div>
+            <div class="stat">💰 Баланс: <span id="tokenBalance">0</span></div>
         </div>
 
         <div id="farmArea"></div>
 
-        <button id="plantBtn">🌱 Посадить (10 WBC)</button>
-        <button id="harvestBtn">🌾 Собрать урожай</button>
-        <button id="droneBtn">🛸 Купить дрон (50 WBC)</button>
-
-        <div id="eventLog"></div>
+        <button id="connectBtn">🔗 Подключить MetaMask</button>
+        <button id="plantBtn" disabled>🌱 Посадить (10 WBC)</button>
+        <button id="harvestBtn" disabled>🌾 Собрать урожай</button>
     </div>
 
+    <!-- Подключаем библиотеки -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.6.9/dist/ethers.umd.min.js"></script>
     <script src="js/game.js"></script>
 </body>
 </html>
