@@ -1,82 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>WABUCU Pre-Game</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WABUCU CyberFarm</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="assets/images/favicon.png">
     <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <script src="js/particles.js" defer></script>
 </head>
 <body>
-    <h1>🌱 Зарабатывайте $WBC!</h1>
-    <button id="connectBtn">🔗 Подключить кошелек</button>
-    <button id="clickBtn" disabled>🌾 Сжать! (0 кликов)</button>
-    <div id="address"></div>
-    <script>
-        // Исправленная версия game.js
-        let userAddress = null;
-        let clickCount = 0;
+    <div id="particles-js"></div>
+    
+    <header class="cyber-header">
+        <h1>🌐 CYBER ECO FARM</h1>
+        <div class="wallet-status" id="walletStatus">
+            <span class="led"></span>
+            <span id="address"></span>
+        </div>
+    </header>
 
-        // 1. Подключение кошелька
-        document.getElementById('connectBtn').addEventListener('click', async () => {
-            console.log('Кнопка подключения нажата'); // Логирование
-            
-            if (window.ethereum) {
-                try {
-                    const accounts = await window.ethereum.request({ 
-                        method: 'eth_requestAccounts' 
-                    });
-                    
-                    userAddress = accounts[0];
-                    console.log('Адрес подключен:', userAddress);
+    <main class="game-container">
+        <div class="farm-area">
+            <div class="cyber-tree" id="mainTree">
+                <div class="energy-pulse"></div>
+                <div class="leaves"></div>
+            </div>
+            <div class="drones-container"></div>
+        </div>
 
-                    // Загрузка сохраненных данных
-                    const savedData = localStorage.getItem(userAddress);
-                    clickCount = savedData ? parseInt(savedData) : 0;
-                    
-                    updateUI();
-                    
-                    // Слушатель изменений аккаунта
-                    window.ethereum.on('accountsChanged', (newAccounts) => {
-                        userAddress = newAccounts[0] || null;
-                        updateUI();
-                    });
+        <div class="hud">
+            <div class="stats-panel">
+                <div class="resource-bar">
+                    <span class="icon">🌱</span>
+                    <div class="bar-container">
+                        <div class="progress" id="oxygenBar"></div>
+                        <span>Oxygen: <span id="oxygenValue">100</span>%</span>
+                    </div>
+                </div>
+                
+                <button class="cyber-button" id="buyDroneBtn">
+                    🛸 Купить дрон (50 WBC)
+                </button>
+            </div>
 
-                } catch (error) {
-                    alert("Ошибка подключения: " + error.message);
-                }
-            } else {
-                alert("Установите MetaMask!");
-            }
-        });
+            <div class="action-panel">
+                <button class="main-action" id="harvestBtn">
+                    <span class="glow">🌾 СЖАТЬ</span>
+                    <div class="click-counter" id="clickCounter">0</div>
+                </button>
+            </div>
+        </div>
+    </main>
 
-        // 2. Обработчик кликов
-        document.getElementById('clickBtn').addEventListener('click', () => {
-            if (!userAddress) return;
-            
-            clickCount++;
-            localStorage.setItem(userAddress, clickCount.toString());
-            console.log('Клики сохранены:', clickCount);
-            
-            updateUI();
-        });
-
-        // 3. Обновление интерфейса
-        function updateUI() {
-            document.getElementById('connectBtn').disabled = !!userAddress;
-            document.getElementById('clickBtn').disabled = !userAddress;
-            document.getElementById('clickBtn').textContent = `🌾 Сжать! (${clickCount} кликов)`;
-            document.getElementById('address').textContent = userAddress 
-                ? `Адрес: ${userAddress.slice(0,6)}...${userAddress.slice(-4)}` 
-                : '';
-        }
-
-        // Автопроверка подключения при загрузке
-        window.addEventListener('load', async () => {
-            if (window.ethereum && window.ethereum.selectedAddress) {
-                userAddress = window.ethereum.selectedAddress;
-                const savedData = localStorage.getItem(userAddress);
-                clickCount = savedData ? parseInt(savedData) : 0;
-                updateUI();
-            }
-        });
-    </script>
+    <div class="achievement-toast" id="achievementToast"></div>
+    <script src="js/game.js"></script>
 </body>
 </html>
